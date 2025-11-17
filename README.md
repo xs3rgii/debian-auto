@@ -7,11 +7,11 @@ Este repositorio contiene un script (`make_iso.sh`) y un archivo de preseed (`pr
 ## 📦 Contenido del repositorio
 
 - **`make_iso.sh`**: Script en Bash que:
-  1. Monta una ISO original de Debian.
-  2. Copia su contenido a una carpeta de trabajo.
-  3. Inserta el `preseed.cfg` en la estructura ISO.
-  4. Modifica los menus de arranque para añadir entradas en UEFI y BIOS
-  5. Regenera la ISO con `xorriso`, conservando la capacidad de arranque en UEFI y BIOS.
+  1.Monta una ISO original de Debian.
+  2.Copia su contenido a una carpeta de trabajo.
+  3.Inserta el `preseed.cfg` en la estructura ISO.
+  4.Modifica los menus de arranque para añadir entradas en UEFI y BIOS
+  5.Regenera la ISO con `xorriso`, conservando la capacidad de arranque en UEFI y BIOS.
 
 ## 🚀 Uso
 
