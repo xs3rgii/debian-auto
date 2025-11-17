@@ -25,5 +25,5 @@ Este repositorio contiene un **script (`make_iso.sh`)** y un archivo de **presee
    git clone https://github.com/xs3rgii/debian-auto.git
    cd debian-auto
 
-### Importante
+### ⚠️ Importante
 A la hora de descargar la iso, debe de tener el nombre de debian-13.iso o modificar la variable de ISO_ORIGINAL en el script para que apunte a la iso
