@@ -26,4 +26,4 @@ Este repositorio contiene un **script (`make_iso.sh`)** y un archivo de **presee
    cd debian-auto
 
 ### ⚠️ Importante
-A la hora de descargar la iso, debe de tener el nombre de ('debian-13.iso') o modificar la variable de ('ISO_ORIGINAL') en el script para que apunte a la iso
+A la hora de descargar la iso, debe de tener el nombre de **`debian-13.iso`** o modificar la variable de **`ISO_ORIGINAL`** en el script para que apunte a la iso
