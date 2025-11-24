@@ -36,4 +36,10 @@ Este repositorio contiene un script (`make_iso.sh`) y un archivo de preseed (`pr
    ```bash
    tail -f /var/log/syslog (Para ver el log del sistema en tiempo real)
    tail -f /var/log/partman (Para ver el log principal de partman)
-   
+
+4. Herramienta Util para diagnostico.
+
+   ```bash
+   nc -l -p 4444 > log
+   nc 172.22.15.228 < /var/log/partman
+   ```
