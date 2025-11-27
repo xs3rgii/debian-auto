@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# ----- Configuración -----
+# ----- Variables de Configuracion -----
 ISO_ORIGINAL="debian-13.iso"
 ISO_NUEVA="debian-13-auto.iso"
 MOUNT_DIR="/tmp/debian_iso_mount"
 ISOFILES_DIR="isofiles"
-PRESEED_FILE="preseed.cfg"
 
+# ----- Configuracion de la ISO -----
 echo "[1] Limpiando..."
 sudo umount "$MOUNT_DIR" 2>/dev/null || true
 rm -rf "$MOUNT_DIR" "$ISOFILES_DIR" "$ISO_NUEVA"
@@ -19,43 +19,28 @@ sudo mount -o loop "$ISO_ORIGINAL" "$MOUNT_DIR"
 echo "[3] Copiando contenido de la ISO original..."
 rsync -a --exclude=md5sum.txt "$MOUNT_DIR/" "$ISOFILES_DIR/"
 
-echo "[4] Añadiendo preseed.cfg en /preseed/"
-mkdir -p "$ISOFILES_DIR/preseed"
-cp "$PRESEED_FILE" "$ISOFILES_DIR/preseed/preseed.cfg"
-
-# ----- Entradas GRUB EFI -----
-echo "[5] Añadiendo entrada GRUB EFI automática..."
+# ----- Entradas GRUB UEFI -----
+echo "[4] Añadiendo entrada de preseed remoto al menú UEFI..."
 sudo bash -c "cat <<EOF >> $ISOFILES_DIR/boot/grub/grub.cfg
 
-menuentry 'Install (Automatic Preseed)' {
-    linux /install.amd/vmlinuz auto=true priority=critical preseed/file=/cdrom/preseed/preseed.cfg preseed/interactive=false
+menuentry 'Install with Network Preseed' {
+    linux /install.amd/vmlinuz auto=true priority=critical preseed/url=https://preseed.mysrg.es/preseed.cfg interface=auto
     initrd /install.amd/initrd.gz
 }
 EOF"
 
 # ----- Entradas ISOLINUX BIOS Legacy -----
-echo "[6] Añadiendo entrada ISOLINUX Legacy..."
-sudo bash -c "cat <<EOF >> $ISOFILES_DIR/isolinux/txt.cfg
+echo "[5] Añadiendo entrada de preseed remoto al menú clásico (BIOS)..."
+sudo bash -c "cat <<EOF >> $ISOFILES_DIR/isolinux/isolinux.cfg
 
-label auto
-  menu label ^Install (Automatic Preseed)
-  kernel /install.amd/vmlinuz
-  append auto=true priority=critical preseed/file=/cdrom/preseed/preseed.cfg preseed/interactive=false initrd=/install.amd/initrd.gz
+label network-preseed
+  MENU LABEL ^Install with Network Preseed
+  KERNEL /install.amd/vmlinuz
+  APPEND auto=true priority=critical preseed/url=https://preseed.mysrg.es/preseed.cfg interface=auto initrd=/install.amd/initrd.gz
 EOF"
 
-# ----- Configurar predeterminada y timeout -----
-sudo sed -i '/^set default=/d' $ISOFILES_DIR/boot/grub/grub.cfg
-sudo bash -c "echo 'set default=\"0\"' >> $ISOFILES_DIR/boot/grub/grub.cfg"
-sudo sed -i '/^set timeout=/d' $ISOFILES_DIR/boot/grub/grub.cfg
-sudo bash -c "echo 'set timeout=5' >> $ISOFILES_DIR/boot/grub/grub.cfg"
-
-sudo sed -i '/^default /d' $ISOFILES_DIR/isolinux/isolinux.cfg
-sudo bash -c "echo 'default auto' >> $ISOFILES_DIR/isolinux/isolinux.cfg"
-sudo sed -i '/^timeout /d' $ISOFILES_DIR/isolinux/isolinux.cfg
-sudo bash -c "echo 'timeout 50' >> $ISOFILES_DIR/isolinux/isolinux.cfg"
-
 # ----- Generar ISO nueva manteniendo estructura original -----
-echo "[7] Generando nueva ISO..."
+echo "[6] Generando nueva ISO..."
 xorriso -as mkisofs \
   -r -V "Debian-Auto" \
   -o "$ISO_NUEVA" \
@@ -74,11 +59,11 @@ xorriso -as mkisofs \
   "$ISOFILES_DIR"
 
 # ----- Desmontar -----
-echo "[8] Desmontando..."
+echo "[7] Desmontando..."
 sudo umount "$MOUNT_DIR" 2>/dev/null || true
 
 # ----- Limpiar carpeta temporal -----
-echo "[9] Limpiando carpeta temporal..."
+echo "[8] Limpiando carpeta temporal..."
 rm -rf "$ISOFILES_DIR" "$MOUNT_DIR"
 
 echo "ISO generada correctamente: $ISO_NUEVA"
