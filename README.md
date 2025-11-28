@@ -1,45 +1,40 @@
-# Debian-Auto – Instalador Debian automatizado con Preseed
+# Debian-Auto – Instalador Debian Automatizado con Preseed
 
-Este repositorio contiene un script (`make_iso.sh`) y un archivo de preseed (`preseed.cfg`) para generar una ISO de Debian personalizada/automática, ideal para instalaciones desatendidas con Debian 13.
+Repositorio para la instalación automática de Debian 13 basado en un fichero de preconfiguración (preseed.cfg) vía red.
 
----
-
-## Contenido del repositorio
-
-- `make_iso.sh`: Script en Bash que:
-
-  1. Monta una ISO original de Debian. 
-  2. Copia su contenido a una carpeta de trabajo. 
-  2. Inserta el `preseed.cfg` en la estructura ISO.
-  4. Modifica los menús de arranque para añadir entradas en UEFI y BIOS.
-  5. Regenera la ISO con `xorriso`, conservando la capacidad de arranque en UEFI y BIOS.
-
----
+> **Nota:** La variable de la ISO puede cambiarse de nombre sin problemas.
 
 ## Uso
 
-1. Clona este repositorio:
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/xs3rgii/debian-auto.git
+cd debian-auto
+```
 
-   ```bash
-   git clone https://github.com/xs3rgii/debian-auto.git
-   cd debian-auto
-   ```
+### 2. Ejecutar el script
+```bash
+sudo ./make_iso.sh
+```
 
-2. Ejecuta el script
+## Diagnóstico
 
-   ```bash
-   sudo ./make_iso.sh
-   ```
+### Comandos para monitorizar el estado de la instalación
+```bash
+# Ver el log del sistema en tiempo real
+tail -f /var/log/syslog
 
-3. Comandos para ver el estado de la instalacion (Para diagnostico)
+# Ver el log principal de partman
+tail -f /var/log/partman
+```
 
-   ```bash
-   tail -f /var/log/syslog (Para ver el log del sistema en tiempo real)
-   tail -f /var/log/partman (Para ver el log principal de partman)
+### Herramienta útil para diagnóstico
 
-4. Herramienta Util para diagnostico.
+Transferencia de logs mediante netcat:
+```bash
+# En el equipo receptor (escucha en el puerto 4444 y guarda en 'log')
+nc -l -p 4444 > log
 
-   ```bash
-   nc -l -p 4444 > log
-   nc 172.22.15.228 < /var/log/partman
-   ```
+# En el equipo emisor (envía el log de partman a la IP 172.22.15.228)
+nc 172.22.15.228 4444 < /var/log/partman
+```
